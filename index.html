@@ -258,6 +258,8 @@
     try{ new Image().src = url; }catch(e){}
   }
 
+  sendEvent('🟢 Patri ha entrado en la web');
+
   const questions = [
     "¿Te acuerdas del último abrazo?",
     "¿Te gustó tanto como a mí?",
@@ -370,7 +372,7 @@
   startBtn.addEventListener('click', () => {
     stage = 'quiz';
     sessionStart = performance.now();
-    sendEvent('🟢 Patri ha abierto la web y le dio a "Empezar"');
+    sendEvent('▶️ Patri le dio a "Empezar"');
     screenIntro.classList.remove('visible');
     screenQuiz.classList.add('visible');
     yesBtn.style.display = 'block';
