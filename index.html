@@ -254,14 +254,9 @@
   }
 
   function sendEventOnUnload(text){
-    if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN") return;
-    if(navigator.sendBeacon){
-      try{
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        const data = new URLSearchParams({ chat_id: TELEGRAM_CHAT_ID, text });
-        if(navigator.sendBeacon(url, data)) return;
-      }catch(e){}
-    }
+    // El método de imagen (GET) es el que funciona de forma fiable en móvil
+    // mientras la página sigue viva (visibilitychange). sendBeacon se descartaba
+    // silenciosamente al cerrar en algunos navegadores.
     sendEvent(text);
   }
 
