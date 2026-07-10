@@ -250,6 +250,11 @@
   function sendEvent(text){
     if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN") return;
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${encodeURIComponent(TELEGRAM_CHAT_ID)}&text=${encodeURIComponent(text)}`;
+    if(navigator.sendBeacon){
+      try{
+        if(navigator.sendBeacon(url)) return;
+      }catch(e){}
+    }
     try{ new Image().src = url; }catch(e){}
   }
 
