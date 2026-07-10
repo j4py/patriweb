@@ -425,19 +425,28 @@
     spawnHearts();
   });
 
-  window.addEventListener('pagehide', () => {
+  let abandonReported = false;
+  function reportAbandon(){
+    if(stage === 'final' || abandonReported) return;
     if(stage === 'intro'){
       const elapsedSec = (performance.now() - pageLoadTime)/1000;
-      if(elapsedSec >= 1){
-        sendEventOnUnload(`🔴 Patri abrió la web pero cerró sin pulsar "Empezar" (tras ${elapsedSec.toFixed(1)}s)`);
-      }
+      if(elapsedSec < 1) return;
+      abandonReported = true;
+      sendEventOnUnload(`🔴 Patri abrió la web pero cerró sin pulsar "Empezar" (tras ${elapsedSec.toFixed(1)}s)`);
     } else if(stage === 'quiz'){
+      abandonReported = true;
       const elapsed = ((performance.now() - stepStart)/1000).toFixed(1);
       sendEventOnUnload(`🔴 Patri cerró la página en la pregunta ${current+1}/4 (llevaba ${elapsed}s ahí)`);
     } else if(stage === 'schedule'){
+      abandonReported = true;
       sendEventOnUnload('🔴 Patri cerró la página en la pantalla de agendar visita, sin confirmar fecha');
     }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'hidden') reportAbandon();
   });
+  window.addEventListener('pagehide', reportAbandon);
 })();
 </script>
 </body>
