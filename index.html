@@ -281,6 +281,7 @@
   let noScale = 1;
   let yesScale = 1;
   let stage = 'intro'; // intro, quiz, schedule, final
+  const pageLoadTime = performance.now();
 
   function formatDate(value){
     if(!value) return null;
@@ -411,7 +412,12 @@
   });
 
   window.addEventListener('pagehide', () => {
-    if(stage === 'quiz'){
+    if(stage === 'intro'){
+      const elapsedSec = (performance.now() - pageLoadTime)/1000;
+      if(elapsedSec >= 1){
+        sendEvent(`🔴 Patri abrió la web pero cerró sin pulsar "Empezar" (tras ${elapsedSec.toFixed(1)}s)`);
+      }
+    } else if(stage === 'quiz'){
       const elapsed = ((performance.now() - stepStart)/1000).toFixed(1);
       sendEvent(`🔴 Patri cerró la página en la pregunta ${current+1}/4 (llevaba ${elapsed}s ahí)`);
     } else if(stage === 'schedule'){
