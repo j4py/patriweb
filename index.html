@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Patri 🧡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --peach:#ffd9b3;
+    --yellow:#fff0b8;
+    --coral:#ffb4a8;
+    --sky:#bfe8ec;
+    --ink:#6b4f3f;
+    --card-bg:rgba(255,255,255,0.72);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family:'Quicksand', ui-rounded, 'Segoe UI', sans-serif;
+    color:var(--ink);
+  }
+  body{
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:linear-gradient(135deg,var(--peach) 0%,var(--yellow) 35%,var(--coral) 70%,var(--sky) 100%);
+    background-size:300% 300%;
+    animation:gradientShift 18s ease infinite;
+    overflow:hidden;
+  }
+  @keyframes gradientShift{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  .card{
+    width:100%;
+    max-width:400px;
+    background:var(--card-bg);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-radius:28px;
+    padding:32px 26px 28px;
+    box-shadow:0 20px 45px rgba(150,100,80,0.25);
+    text-align:center;
+    position:relative;
+  }
+  .greeting{
+    font-size:0.85rem;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:#c07856;
+    margin:0 0 6px;
+    opacity:0.85;
+  }
+  .dots{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:rgba(107,79,63,0.22);
+    transition:background .3s ease, transform .3s ease;
+  }
+  .dot.active{
+    background:linear-gradient(135deg,#ff9a76,#ff6f91);
+    transform:scale(1.25);
+  }
+  #screen-intro h1{
+    font-size:1.5rem;
+    margin:6px 0 10px;
+  }
+  #screen-intro p{
+    font-size:0.98rem;
+    line-height:1.5;
+    margin:0 0 26px;
+    opacity:0.9;
+  }
+  .question{
+    font-size:1.28rem;
+    font-weight:600;
+    line-height:1.4;
+    min-height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 4px;
+    opacity:0;
+    transform:translateY(8px);
+    animation:fadeIn .45s ease forwards;
+  }
+  @keyframes fadeIn{
+    to{opacity:1;transform:translateY(0);}
+  }
+  .button-zone{
+    position:relative;
+    height:170px;
+    margin-top:8px;
+  }
+  button{
+    font-family:inherit;
+    border:none;
+    cursor:pointer;
+    font-weight:700;
+    border-radius:999px;
+    padding:14px 30px;
+    font-size:1.02rem;
+    position:absolute;
+    top:0;
+    left:0;
+    transform-origin:center center;
+    transition:transform .18s ease, left .28s cubic-bezier(.34,1.56,.64,1), top .28s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+    white-space:nowrap;
+  }
+  #startBtn,#yesBtn{
+    background:linear-gradient(135deg,#ff9a76,#ff6f91);
+    color:#fff;
+    box-shadow:0 10px 24px rgba(255,111,145,0.45);
+  }
+  #startBtn:active,#yesBtn:active{transform:scale(0.95);}
+  #startBtn{
+    position:static;
+    margin-top:4px;
+  }
+  #noBtn{
+    background:rgba(255,255,255,0.85);
+    color:var(--ink);
+    border:2px solid rgba(107,79,63,0.15);
+    box-shadow:0 6px 16px rgba(150,100,80,0.15);
+  }
+  .hint{
+    margin-top:14px;
+    font-size:0.78rem;
+    opacity:0.55;
+  }
+  #screen-final .emoji-big{
+    font-size:2.6rem;
+    margin-bottom:8px;
+  }
+  #screen-final h2{
+    font-size:1.4rem;
+    margin:0 0 10px;
+  }
+  #screen-final p{
+    font-size:1rem;
+    line-height:1.5;
+    opacity:0.9;
+    margin:0;
+  }
+  .hearts-overlay{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:50;
+  }
+  .heart{
+    position:absolute;
+    top:-40px;
+    font-size:1.4rem;
+    animation:fall linear forwards;
+    opacity:0.9;
+  }
+  @keyframes fall{
+    to{
+      transform:translateY(115vh) rotate(360deg);
+      opacity:0;
+    }
+  }
+  .screen{display:none;}
+  .screen.visible{display:block;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <p class="greeting">Para Patri 🧡</p>
+
+  <div id="screen-intro" class="screen visible">
+    <h1>Hola Patri 👋</h1>
+    <p>Tengo un par de preguntas para ti... solo un par, prometido.</p>
+    <button id="startBtn">Empezar 💌</button>
+  </div>
+
+  <div id="screen-quiz" class="screen">
+    <div class="dots" id="dots"></div>
+    <div class="question" id="questionText"></div>
+    <div class="button-zone" id="buttonZone">
+      <button id="yesBtn">Sí</button>
+      <button id="noBtn">No</button>
+    </div>
+    <p class="hint">psst... el botón "No" tiene vida propia 🙃</p>
+  </div>
+
+  <div id="screen-final" class="screen">
+    <div class="emoji-big">🎉🧡☀️</div>
+    <h2>¡Sabía que dirías que sí!</h2>
+    <p>Contando los días para verte este verano.</p>
+  </div>
+</div>
+
+<div class="hearts-overlay" id="heartsOverlay"></div>
+
+<script>
+(function(){
+  // ---- Configura aquí tu bot de Telegram ----
+  const TELEGRAM_BOT_TOKEN = "8802050289:AAE_jNxDJARuWhZ4L-wrtF7MGTDdPEgzjjE";
+  const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID";
+  // --------------------------------------------
+
+  function sendEvent(text){
+    if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN") return;
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${encodeURIComponent(TELEGRAM_CHAT_ID)}&text=${encodeURIComponent(text)}`;
+    try{ new Image().src = url; }catch(e){}
+  }
+
+  const questions = [
+    "Patriii, ¿te acuerdas del último abrazo?",
+    "¿Te gustó tanto como a mí?",
+    "¿Has pensado en repetirlo?",
+    "Entonces... ¿te veré este verano? 🥹"
+  ];
+
+  const screenIntro = document.getElementById('screen-intro');
+  const screenQuiz = document.getElementById('screen-quiz');
+  const screenFinal = document.getElementById('screen-final');
+  const startBtn = document.getElementById('startBtn');
+  const dotsEl = document.getElementById('dots');
+  const questionText = document.getElementById('questionText');
+  const zone = document.getElementById('buttonZone');
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn = document.getElementById('noBtn');
+
+  let current = 0;
+  let stepStart = 0;
+  let sessionStart = 0;
+  let dodgeCount = 0;
+  let noScale = 1;
+  let yesScale = 1;
+  let started = false;
+  let finished = false;
+
+  dotsEl.innerHTML = questions.map(() => '<span class="dot"></span>').join('');
+  const dotEls = dotsEl.querySelectorAll('.dot');
+
+  function setPos(el, xCenter, yCenter, scale){
+    const w = el.offsetWidth, h = el.offsetHeight;
+    el.style.left = Math.round(xCenter - w/2) + 'px';
+    el.style.top = Math.round(yCenter - h/2) + 'px';
+    el.style.transform = `scale(${scale})`;
+  }
+
+  function placeDefault(){
+    const r = zone.getBoundingClientRect();
+    setPos(yesBtn, r.width*0.5, r.height*0.28, 1);
+    setPos(noBtn, r.width*0.5, r.height*0.75, 1);
+  }
+
+  function render(){
+    dotEls.forEach((d,i) => d.classList.toggle('active', i <= current));
+    questionText.style.animation = 'none';
+    void questionText.offsetWidth;
+    questionText.style.animation = null;
+    questionText.textContent = questions[current];
+    dodgeCount = 0;
+    noScale = 1;
+    yesScale = 1;
+    requestAnimationFrame(placeDefault);
+    stepStart = performance.now();
+  }
+
+  function evadeNo(){
+    if(finished) return;
+    dodgeCount++;
+    const r = zone.getBoundingClientRect();
+    const pad = 36;
+    const x = pad + Math.random() * Math.max(r.width - pad*2, 10);
+    const y = pad + Math.random() * Math.max(r.height - pad*2, 10);
+    noScale = Math.max(0.55, noScale - 0.045);
+    yesScale = Math.min(1.35, yesScale + 0.03);
+    setPos(noBtn, x, y, noScale);
+    yesBtn.style.transform = `scale(${yesScale})`;
+  }
+
+  let ticking = false;
+  document.addEventListener('pointermove', (e) => {
+    if(!started || finished || ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const r = noBtn.getBoundingClientRect();
+      const cx = r.left + r.width/2, cy = r.top + r.height/2;
+      const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+      if(dist < 85) evadeNo();
+    });
+  });
+  noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); evadeNo(); }, {passive:false});
+  noBtn.addEventListener('click', (e) => { e.preventDefault(); evadeNo(); });
+
+  function spawnHearts(){
+    const overlay = document.getElementById('heartsOverlay');
+    const emojis = ['❤️','🧡','💛'];
+    let count = 0;
+    const interval = setInterval(() => {
+      for(let i=0;i<4;i++){
+        const h = document.createElement('span');
+        h.className = 'heart';
+        h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        h.style.left = Math.random()*100 + 'vw';
+        h.style.fontSize = (1 + Math.random()*1.4) + 'rem';
+        h.style.animationDuration = (3 + Math.random()*2.5) + 's';
+        overlay.appendChild(h);
+        setTimeout(() => h.remove(), 6000);
+      }
+      count++;
+      if(count > 18) clearInterval(interval);
+    }, 220);
+  }
+
+  startBtn.addEventListener('click', () => {
+    started = true;
+    sessionStart = performance.now();
+    sendEvent('🟢 Patri ha abierto la web y le dio a "Empezar"');
+    screenIntro.classList.remove('visible');
+    screenQuiz.classList.add('visible');
+    render();
+  });
+
+  yesBtn.addEventListener('click', () => {
+    if(!started || finished) return;
+    const elapsed = ((performance.now() - stepStart)/1000).toFixed(1);
+    sendEvent(`✅ Pregunta ${current+1}/4 respondida en ${elapsed}s (intentos de "No": ${dodgeCount})\n"${questions[current]}"`);
+
+    if(current === questions.length - 1){
+      finished = true;
+      const total = ((performance.now() - sessionStart)/1000).toFixed(1);
+      sendEvent(`🎉 ¡Patri completó toda la rueda de preguntas! Tiempo total: ${total}s`);
+      screenQuiz.classList.remove('visible');
+      screenFinal.classList.add('visible');
+      spawnHearts();
+    } else {
+      current++;
+      render();
+    }
+  });
+
+  window.addEventListener('pagehide', () => {
+    if(started && !finished){
+      const elapsed = ((performance.now() - stepStart)/1000).toFixed(1);
+      sendEvent(`🔴 Patri cerró la página en la pregunta ${current+1}/4 (llevaba ${elapsed}s ahí)`);
+    }
+  });
+})();
+</script>
+</body>
+</html>
