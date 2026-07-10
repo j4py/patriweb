@@ -137,6 +137,44 @@
     opacity:0.9;
     margin:0;
   }
+  #screen-schedule h2{
+    font-size:1.3rem;
+    margin:0 0 8px;
+  }
+  #screen-schedule > p{
+    font-size:0.95rem;
+    line-height:1.5;
+    opacity:0.85;
+    margin:0 0 22px;
+  }
+  .field{
+    text-align:left;
+    margin-bottom:16px;
+  }
+  .field label{
+    display:block;
+    font-size:0.82rem;
+    font-weight:600;
+    margin-bottom:6px;
+    opacity:0.8;
+  }
+  .field input[type="date"]{
+    width:100%;
+    padding:12px 14px;
+    border-radius:14px;
+    border:2px solid rgba(107,79,63,0.15);
+    background:rgba(255,255,255,0.9);
+    font-family:inherit;
+    font-size:1rem;
+    color:var(--ink);
+  }
+  #scheduleBtn{
+    background:linear-gradient(135deg,#ff9a76,#ff6f91);
+    color:#fff;
+    box-shadow:0 10px 24px rgba(255,111,145,0.45);
+    margin-top:6px;
+  }
+  #scheduleBtn:active{transform:scale(0.95);}
   .hearts-overlay{
     position:fixed;
     inset:0;
@@ -176,10 +214,24 @@
     <div class="button-zone" id="buttonZone"></div>
   </div>
 
+  <div id="screen-schedule" class="screen">
+    <h2>¡Genial! 🎉</h2>
+    <p>Apunta unas fechas orientativas para tu visita:</p>
+    <div class="field">
+      <label for="arrivalDate">Llegada</label>
+      <input type="date" id="arrivalDate" />
+    </div>
+    <div class="field">
+      <label for="departureDate">Salida</label>
+      <input type="date" id="departureDate" />
+    </div>
+    <button id="scheduleBtn">Confirmar 💌</button>
+  </div>
+
   <div id="screen-final" class="screen">
     <div class="emoji-big">🎉🧡☀️</div>
     <h2>¡Sabía que dirías que sí!</h2>
-    <p>Contando los días para verte este verano.</p>
+    <p id="finalMessage"></p>
   </div>
 </div>
 
@@ -210,8 +262,13 @@
 
   const screenIntro = document.getElementById('screen-intro');
   const screenQuiz = document.getElementById('screen-quiz');
+  const screenSchedule = document.getElementById('screen-schedule');
   const screenFinal = document.getElementById('screen-final');
   const startBtn = document.getElementById('startBtn');
+  const scheduleBtn = document.getElementById('scheduleBtn');
+  const arrivalInput = document.getElementById('arrivalDate');
+  const departureInput = document.getElementById('departureDate');
+  const finalMessage = document.getElementById('finalMessage');
   const questionText = document.getElementById('questionText');
   const zone = document.getElementById('buttonZone');
   const yesBtn = document.getElementById('yesBtn');
@@ -223,8 +280,13 @@
   let dodgeCount = 0;
   let noScale = 1;
   let yesScale = 1;
-  let started = false;
-  let finished = false;
+  let stage = 'intro'; // intro, quiz, schedule, final
+
+  function formatDate(value){
+    if(!value) return null;
+    const [y,m,d] = value.split('-');
+    return `${d}/${m}/${y}`;
+  }
 
   function setPos(el, xCenter, yCenter, scale){
     const w = el.offsetWidth, h = el.offsetHeight;
@@ -252,7 +314,7 @@
   }
 
   function evadeNo(){
-    if(finished) return;
+    if(stage !== 'quiz') return;
     dodgeCount++;
     const pad = 50;
     const vw = window.innerWidth, vh = window.innerHeight;
@@ -266,7 +328,7 @@
 
   let ticking = false;
   document.addEventListener('pointermove', (e) => {
-    if(!started || finished || ticking) return;
+    if(stage !== 'quiz' || ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
       ticking = false;
@@ -300,7 +362,7 @@
   }
 
   startBtn.addEventListener('click', () => {
-    started = true;
+    stage = 'quiz';
     sessionStart = performance.now();
     sendEvent('🟢 Patri ha abierto la web y le dio a "Empezar"');
     screenIntro.classList.remove('visible');
@@ -311,29 +373,49 @@
   });
 
   yesBtn.addEventListener('click', () => {
-    if(!started || finished) return;
+    if(stage !== 'quiz') return;
     const elapsed = ((performance.now() - stepStart)/1000).toFixed(1);
     sendEvent(`✅ Pregunta ${current+1}/4 respondida en ${elapsed}s (intentos de "No": ${dodgeCount})\n"${questions[current]}"`);
 
     if(current === questions.length - 1){
-      finished = true;
+      stage = 'schedule';
       const total = ((performance.now() - sessionStart)/1000).toFixed(1);
-      sendEvent(`🎉 ¡Patri completó toda la rueda de preguntas! Tiempo total: ${total}s`);
+      sendEvent(`🎉 ¡Patri completó toda la rueda de preguntas! Tiempo total: ${total}s. Ahora está agendando la visita...`);
       screenQuiz.classList.remove('visible');
-      screenFinal.classList.add('visible');
+      screenSchedule.classList.add('visible');
       yesBtn.style.display = 'none';
       noBtn.style.display = 'none';
-      spawnHearts();
     } else {
       current++;
       render();
     }
   });
 
+  scheduleBtn.addEventListener('click', () => {
+    if(stage !== 'schedule') return;
+    const arrival = formatDate(arrivalInput.value);
+    const departure = formatDate(departureInput.value);
+
+    let datesText;
+    if(arrival && departure) datesText = `del ${arrival} al ${departure}`;
+    else if(arrival) datesText = `a partir del ${arrival}`;
+    else datesText = 'este verano';
+
+    sendEvent(`📅 Patri agendó su visita: ${arrival || 'sin fecha de llegada'}${departure ? ' → ' + departure : ''}`);
+
+    finalMessage.textContent = `Nos vemos ${datesText} 🧡`;
+    stage = 'final';
+    screenSchedule.classList.remove('visible');
+    screenFinal.classList.add('visible');
+    spawnHearts();
+  });
+
   window.addEventListener('pagehide', () => {
-    if(started && !finished){
+    if(stage === 'quiz'){
       const elapsed = ((performance.now() - stepStart)/1000).toFixed(1);
       sendEvent(`🔴 Patri cerró la página en la pregunta ${current+1}/4 (llevaba ${elapsed}s ahí)`);
+    } else if(stage === 'schedule'){
+      sendEvent('🔴 Patri cerró la página en la pantalla de agendar visita, sin confirmar fecha');
     }
   });
 })();
