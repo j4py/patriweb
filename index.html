@@ -326,6 +326,7 @@
     yesScale = 1;
     requestAnimationFrame(placeDefault);
     stepStart = performance.now();
+    sendEvent(`📍 Viendo pregunta ${current+1}/4: "${questions[current]}"`);
   }
 
   function evadeNo(){
