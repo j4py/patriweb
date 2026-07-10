@@ -250,12 +250,19 @@
   function sendEvent(text){
     if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN") return;
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${encodeURIComponent(TELEGRAM_CHAT_ID)}&text=${encodeURIComponent(text)}`;
+    try{ new Image().src = url; }catch(e){}
+  }
+
+  function sendEventOnUnload(text){
+    if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN") return;
     if(navigator.sendBeacon){
       try{
-        if(navigator.sendBeacon(url)) return;
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        const data = new URLSearchParams({ chat_id: TELEGRAM_CHAT_ID, text });
+        if(navigator.sendBeacon(url, data)) return;
       }catch(e){}
     }
-    try{ new Image().src = url; }catch(e){}
+    sendEvent(text);
   }
 
   sendEvent('🟢 Patri ha entrado en la web');
@@ -422,13 +429,13 @@
     if(stage === 'intro'){
       const elapsedSec = (performance.now() - pageLoadTime)/1000;
       if(elapsedSec >= 1){
-        sendEvent(`🔴 Patri abrió la web pero cerró sin pulsar "Empezar" (tras ${elapsedSec.toFixed(1)}s)`);
+        sendEventOnUnload(`🔴 Patri abrió la web pero cerró sin pulsar "Empezar" (tras ${elapsedSec.toFixed(1)}s)`);
       }
     } else if(stage === 'quiz'){
       const elapsed = ((performance.now() - stepStart)/1000).toFixed(1);
-      sendEvent(`🔴 Patri cerró la página en la pregunta ${current+1}/4 (llevaba ${elapsed}s ahí)`);
+      sendEventOnUnload(`🔴 Patri cerró la página en la pregunta ${current+1}/4 (llevaba ${elapsed}s ahí)`);
     } else if(stage === 'schedule'){
-      sendEvent('🔴 Patri cerró la página en la pantalla de agendar visita, sin confirmar fecha');
+      sendEventOnUnload('🔴 Patri cerró la página en la pantalla de agendar visita, sin confirmar fecha');
     }
   });
 })();
